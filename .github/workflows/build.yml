@@ -45,10 +45,10 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: tauri-macos
-          path: tauri-app-macos.zip
+          path: ../tauri-app-macos.zip
 
       - name: Debug Build Output
-        run: ls -lah src-tauri/target/release/bundle/macos/
+        run: ls -lah ../
 
 
 
