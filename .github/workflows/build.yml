@@ -41,13 +41,13 @@ jobs:
         run: |
           codesign --deep --force --verbose --sign - src-tauri/target/release/bundle/macos/tauri-app.app
 
-      - name: Compress macOS App (ZIP)
-        run: |
-          zip -r src-tauri/target/release/tauri-app-macos.zip src-tauri/target/release/bundle/macos/tauri-app.app
+      # - name: Compress macOS App (ZIP)
+      #   run: |
+      #     zip -r src-tauri/target/release/tauri-app-macos.zip src-tauri/target/release/bundle/macos/tauri-app.app
 
       - name: Create Signed ZIP
         run: |
-          ditto -c -k --keepParent src-tauri/target/release/bundle/macos/tauri-app.app tauri-app-macos.zip
+          ditto -c -k --keepParent src-tauri/target/release/bundle/macos/tauri-app.app src-tauri/target/release/tauri-app-macos.zip
 
       - name: Debug Build Output
         run: ls -lah src-tauri/target/release/
