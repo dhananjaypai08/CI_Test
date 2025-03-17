@@ -41,7 +41,11 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: tauri-macos
-          path: src-tauri/target/release/bundle/macos/*.app
+          path: src-tauri/target/release/bundle/macos/tauri-app.app
+
+      - name: Debug Build Output
+        run: ls -lah src-tauri/target/release/bundle/macos/
+
 
 
   # build-windows:
