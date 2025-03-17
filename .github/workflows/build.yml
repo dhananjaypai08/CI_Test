@@ -1,0 +1,112 @@
+name: Build Tauri App
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build-macos:
+    runs-on: macos-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        working-directory: ./tauri-app
+
+      - name: Install dependencies
+        run: |
+          brew install node
+          brew install rustup
+          rustup-init -y
+          source $HOME/.cargo/env
+          rustup target add aarch64-apple-darwin
+          npm install
+        working-directory: ./tauri-app
+
+      - name: Cache Rust Dependencies
+        uses: swatinem/rust-cache@v2
+        working-directory: ./tauri-app
+
+      - name: Build Tauri app (macOS)
+        run: npm tauri build --target aarch64-apple-darwin
+        working-directory: ./tauri-app
+
+      - name: Upload macOS build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: tauri-macos
+          path: src-tauri/target/aarch64-apple-darwin/release/bundle/
+        working-directory: ./tauri-app
+
+  build-windows:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        working-directory: ./tauri-app
+
+      - name: Install dependencies
+        run: |
+          choco install nodejs
+          rustup-init -y
+          rustup default stable
+          rustup target add x86_64-pc-windows-msvc
+          npm install
+        working-directory: ./tauri-app
+
+      - name: Cache Rust Dependencies
+        uses: swatinem/rust-cache@v2
+
+      - name: Build Tauri app (Windows)
+        run: npm tauri build --target x86_64-pc-windows-msvc
+        working-directory; ./tauri-app
+
+      - name: Upload Windows build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: tauri-windows
+          path: src-tauri/target/x86_64-pc-windows-msvc/release/bundle/
+        working-directory: ./tauri-app
+
+on:
+  push:
+    tags:
+      - "v*.*.*"
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    needs: [build-macos, build-windows]
+    steps:
+      - name: Download macOS artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: tauri-macos
+        working-directory: ./tauri-app
+
+      - name: Download Windows artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: tauri-windows
+        working-directory: ./tauri-app
+
+      - name: Publish Release
+        uses: softprops/action-gh-release@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          files: |
+            tauri-macos/*
+            tauri-windows/*
+          tag_name: ${{ github.ref_name }}
+          name: "Tauri v${{ github.ref_name }}"
+          body: "Download the latest Tauri build."
+          draft: false
+          prerelease: false
