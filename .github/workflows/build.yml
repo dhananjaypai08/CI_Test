@@ -38,14 +38,15 @@ jobs:
         run: npm run tauri build -- --bundles app
 
       - name: Compress macOS App (ZIP)
-        run: zip -r tauri-app-macos.zip src-tauri/target/release/bundle/macos/tauri-app.app
+        run: |
+          zip -r src-tauri/target/release/tauri-app-macos.zip src-tauri/target/release/bundle/macos/tauri-app.app
 
 
       - name: Upload macOS build artifact
         uses: actions/upload-artifact@v4
         with:
           name: tauri-macos
-          path: ../tauri-app-macos.zip
+          path: src-tauri/target/release/tauri-app-macos.zip
 
       - name: Debug Build Output
         run: ls -lah ../
