@@ -37,6 +37,10 @@ jobs:
       - name: Build Tauri app (macOS)
         run: npm run tauri build -- --bundles app
 
+      - name: Code Sign App
+        run: |
+          codesign --deep --force --verbose --sign - src-tauri/target/release/bundle/macos/tauri-app.app
+
       - name: Compress macOS App (ZIP)
         run: |
           zip -r src-tauri/target/release/tauri-app-macos.zip src-tauri/target/release/bundle/macos/tauri-app.app
