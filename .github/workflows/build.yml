@@ -7,9 +7,6 @@ on:
   pull_request:
     branches:
       - master
-  push:
-    tags:
-      - "v*.*.*" # Runs when a tag like v1.0.0 is pushed
   workflow_dispatch:
 
 permissions:
@@ -38,16 +35,13 @@ jobs:
         uses: swatinem/rust-cache@v2
 
       - name: Build Tauri app (macOS)
-        run: npm run tauri build -- --bundles app --verbose
-
-      - name: Debug Build Output
-        run: ls -lah src-tauri/target/release/bundle/macos/
+        run: npm run tauri build -- --bundles app
 
       - name: Compress macOS App (ZIP)
         run: |
           zip -r src-tauri/target/release/tauri-app-macos.zip src-tauri/target/release/bundle/macos/tauri-app.app
 
-      - name: Verify ZIP Exists
+      - name: Debug Build Output
         run: ls -lah src-tauri/target/release/
 
       - name: Upload macOS build artifact
@@ -80,3 +74,34 @@ jobs:
           body: "Download the latest Tauri macOS build."
           draft: false
           prerelease: false
+
+
+  # build-windows:
+  #   runs-on: windows-latest
+  #   defaults:
+  #     run:
+  #       working-directory: ./tauri-app
+  #   steps:
+  #     - name: Checkout repository
+  #       uses: actions/checkout@v4
+
+  #     - name: Install dependencies
+  #       run: |
+  #         choco install nodejs
+  #         choco install -y rustup.install
+  #         
+  #         rustup default stable
+  #         rustup target add x86_64-pc-windows-msvc
+  #         npm install
+
+  #     - name: Cache Rust Dependencies
+  #       uses: swatinem/rust-cache@v2
+
+  #     - name: Build Tauri app (Windows)
+  #       run: npm run tauri build 
+
+  #     - name: Upload Windows build artifact
+  #       uses: actions/upload-artifact@v4
+  #       with:
+  #         name: tauri-windows
+  #         path: src-tauri/target/x86_64-pc-windows-msvc/release/bundle/
