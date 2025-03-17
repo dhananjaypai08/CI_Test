@@ -36,7 +36,7 @@ jobs:
         uses: swatinem/rust-cache@v2
 
       - name: Build Tauri app (macOS)
-        run: pnpm tauri build -- --bundles app
+        run: pnpm tauri build
 
       - name: Code Sign App
         run: |
