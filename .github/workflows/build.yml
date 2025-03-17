@@ -87,10 +87,10 @@ jobs:
         run: npm run tauri build 
 
       - name: Debug Windows Build Output
-        run: ls src-tauri/target/x86_64-pc-windows-msvc/release/bundle/
+        run: ls src-tauri/target/release/bundle/
 
       - name: Compress Windows Executable
-        run: 7z a -tzip src-tauri/target/release/tauri-app-windows.zip src-tauri/target/x86_64-pc-windows-msvc/release/bundle/tauri-app.exe
+        run: 7z a -tzip src-tauri/target/release/tauri-app-windows.zip src-tauri/target/release/bundle/tauri-app.exe
 
       - name: Verify Windows ZIP Exists
         run: ls -lah src-tauri/target/release/
