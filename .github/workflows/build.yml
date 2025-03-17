@@ -35,7 +35,7 @@ jobs:
         working-directory: ./tauri-app
 
       - name: Build Tauri app (macOS)
-        run: npm tauri build --target aarch64-apple-darwin
+        run: npm run tauri build -- --bundles app
         working-directory: ./tauri-app
 
       - name: Upload macOS build artifact
@@ -65,7 +65,7 @@ jobs:
         uses: swatinem/rust-cache@v2
 
       - name: Build Tauri app (Windows)
-        run: npm tauri build --target x86_64-pc-windows-msvc
+        run: npm run tauri build
         working-directory; ./tauri-app
 
       - name: Upload Windows build artifact
