@@ -7,6 +7,9 @@ on:
   pull_request:
     branches:
       - master
+  push:
+    tags:
+      - "v*.*.*" # Runs when a tag like v1.0.0 is pushed
   workflow_dispatch:
 
 permissions:
@@ -35,13 +38,16 @@ jobs:
         uses: swatinem/rust-cache@v2
 
       - name: Build Tauri app (macOS)
-        run: npm run tauri build -- --bundles app
+        run: npm run tauri build -- --bundles app --verbose
+
+      - name: Debug Build Output
+        run: ls -lah src-tauri/target/release/bundle/macos/
 
       - name: Compress macOS App (ZIP)
         run: |
           zip -r src-tauri/target/release/tauri-app-macos.zip src-tauri/target/release/bundle/macos/tauri-app.app
 
-      - name: Debug Build Output
+      - name: Verify ZIP Exists
         run: ls -lah src-tauri/target/release/
 
       - name: Upload macOS build artifact
@@ -50,33 +56,27 @@ jobs:
           name: tauri-macos
           path: ${{ github.workspace }}/tauri-app/src-tauri/target/release/tauri-app-macos.zip
 
+  release:
+    runs-on: ubuntu-latest
+    needs: build-macos
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-  # build-windows:
-  #   runs-on: windows-latest
-  #   defaults:
-  #     run:
-  #       working-directory: ./tauri-app
-  #   steps:
-  #     - name: Checkout repository
-  #       uses: actions/checkout@v4
+      - name: Download macOS artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: tauri-macos
+          path: ./
 
-  #     - name: Install dependencies
-  #       run: |
-  #         choco install nodejs
-  #         choco install -y rustup.install
-  #         
-  #         rustup default stable
-  #         rustup target add x86_64-pc-windows-msvc
-  #         npm install
-
-  #     - name: Cache Rust Dependencies
-  #       uses: swatinem/rust-cache@v2
-
-  #     - name: Build Tauri app (Windows)
-  #       run: npm run tauri build 
-
-  #     - name: Upload Windows build artifact
-  #       uses: actions/upload-artifact@v4
-  #       with:
-  #         name: tauri-windows
-  #         path: src-tauri/target/x86_64-pc-windows-msvc/release/bundle/
+      - name: Publish Release
+        uses: softprops/action-gh-release@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          files: tauri-app-macos.zip
+          tag_name: ${{ github.ref_name }}
+          name: "Tauri Release ${{ github.ref_name }}"
+          body: "Download the latest Tauri macOS build."
+          draft: false
+          prerelease: false
