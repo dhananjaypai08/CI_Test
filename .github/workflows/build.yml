@@ -45,9 +45,6 @@ jobs:
         run: |
           ditto -c -k --keepParent src-tauri/target/release/bundle/macos/tauri-app.app src-tauri/target/release/tauri-app-macos.zip
 
-      - name: Debug Build Output
-        run: ls -lah src-tauri/target/release/
-
       - name: Upload macOS build artifact
         uses: actions/upload-artifact@v4
         with:
@@ -86,14 +83,8 @@ jobs:
       - name: Build Tauri app (Windows)
         run: npm run tauri build 
 
-      - name: Debug Windows Build Output
-        run: ls src-tauri/target/release/bundle/
-
       - name: Compress Windows Executable
-        run: 7z a -tzip src-tauri/target/release/tauri-app-windows.zip src-tauri/target/release/bundle/tauri-app.exe
-
-      - name: Verify Windows ZIP Exists
-        run: ls -lah src-tauri/target/release/
+        run: 7z a -tzip src-tauri/target/release/tauri-app-windows.zip src-tauri/target/release/bundle/nsis/tauri-app_0.1.0_x64-setup.exe
 
       - name: Upload Windows build artifact
         uses: actions/upload-artifact@v4
