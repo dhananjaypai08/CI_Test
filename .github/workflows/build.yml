@@ -29,13 +29,14 @@ jobs:
           rustup-init -y
           source $HOME/.cargo/env
           rustup target add aarch64-apple-darwin
+          npm install -g pnpm
           npm install
 
       - name: Cache Rust Dependencies
         uses: swatinem/rust-cache@v2
 
       - name: Build Tauri app (macOS)
-        run: npm run tauri build -- --bundles app
+        run: pnpm tauri build -- --bundles app
 
       - name: Code Sign App
         run: |
@@ -75,13 +76,14 @@ jobs:
           rustup default stable
           rustup target add x86_64-pc-windows-msvc
           refreshenv
+          npm install -g pnpm
           npm install
 
       - name: Cache Rust Dependencies
         uses: swatinem/rust-cache@v2
 
       - name: Build Tauri app (Windows)
-        run: npm run tauri build 
+        run: pnpm tauri build 
 
       - name: Compress Windows Executable
         run: 7z a -tzip src-tauri/target/release/tauri-app-windows.zip src-tauri/target/release/bundle/nsis/tauri-app_0.1.0_x64-setup.exe
