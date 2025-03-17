@@ -41,16 +41,14 @@ jobs:
         run: |
           zip -r src-tauri/target/release/tauri-app-macos.zip src-tauri/target/release/bundle/macos/tauri-app.app
 
+      - name: Debug Build Output
+        run: ls -lah src-tauri/target/release/
 
       - name: Upload macOS build artifact
         uses: actions/upload-artifact@v4
         with:
           name: tauri-macos
-          path: src-tauri/target/release/tauri-app-macos.zip
-
-      - name: Debug Build Output
-        run: ls -lah ../
-
+          path: ${{ github.workspace }}/tauri-app/src-tauri/target/release/tauri-app-macos.zip
 
 
   # build-windows:
